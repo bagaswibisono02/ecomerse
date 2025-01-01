@@ -85,4 +85,8 @@ class pesanan extends Model
         return $this->hasOne(konfirmasiPembayaran::class);
     }
 
+    function review() {
+        return $this->hasOne(reviewProduk::class);
+    }
+
 }

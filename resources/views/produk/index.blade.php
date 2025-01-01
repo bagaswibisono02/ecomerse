@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 @section('content')
     <div class="container">
-   
+
         <a href="/produk/create" class= "m-3 btn btn-primary">Tambah Produk</a>
         <a class="btn btn-success" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Kategory
@@ -99,8 +99,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Category</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
@@ -136,9 +135,9 @@
                                         {{ Str::limit($p->nama, 50, '...') }}</a></h5>
                                 <br>
                                 <h6 class="card-subtitle small mb-2 text-muted">Harga: @currency($p->harga)</h6>
-                              
+
                                 <div class="d-flex justify-content-between align-items-center">
-                                 
+
                                     <div class="btn-group dropup">
                                         <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown"
                                             aria-expanded="false">
@@ -149,7 +148,17 @@
                                                     d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
                                             </svg>
                                         </a>
-                                        <ul class="dropdown-menu dropup " width=>
+                                        <ul class="dropdown-menu dropup " width="100%">
+                                            <li> <form class="col-12" action="/update-terjual/{{ encrypt($p->id) }}" method="post"> 
+                                                @csrf
+                                                <div class="d-flex">
+                                                    <input class="col-6 formcontrol" type="number" name="terjual">
+                                                    <button class="btn btn-success" type="submit" onclick="return confirm('Update Terjual ?')">Simpan</button>
+                                                </div>
+                                               
+                                            
+                                            </form>
+                                            </li>
                                             <li><a class="dropdown-item"
                                                     href="/produk/{{ encrypt($p->id) }}/edit">Update</a>
                                             </li>
@@ -164,7 +173,7 @@
                                         </ul>
                                     </div>
 
-                                    <a class="text-muted">Terjual 900</a>
+                                    <a class="text-muted">Terjual {{ $p->terjual }}</a>
 
 
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\free_ongkir;
 use App\Models\kategory;
 use App\Models\media_produk;
+use App\Models\pesanan;
 use App\Models\produk;
 use App\Models\produk_user;
 use App\Models\provinsi;
@@ -291,12 +292,15 @@ class ProdukController extends Controller
         }
     }
 
-    public function lihatProduk(Request $request)
+    public function lihatProduk(Request $request,$slug)
     {
+        // dd(str_replace('-', ' ', $slug));
 
         $data = decrypt($request->data);
         $encrypted_id = $data['id'];
         $produk_id = decrypt($encrypted_id);
+     
+
 
         if (Auth::check()) {
             $cekLihatBelum = produk_user::where('user_id', Auth::User()->id)->where('produk_id', $produk_id)->first();
@@ -320,6 +324,8 @@ class ProdukController extends Controller
         }
         return view('produk.lihatProduk', [
             'produk' => produk::find($produk_id),
+            'reviews'=>produk::find($produk_id)->review()->paginate(10),
+            'produkSerupa'=>produk::where('kategory_id',produk::find($produk_id)->kategory_id)->where('id','!=',$produk_id)->paginate(10),
             'kategorys' => kategory::all(),
         ]);
     }
@@ -329,5 +335,29 @@ class ProdukController extends Controller
 
         varian::find($id_varian)->delete();
         return back();
+    }
+
+    function review(Request $request) {
+        return view('produk.review',[
+            'kategorys' => kategory::all(),
+            'pesanans'=>pesanan::where('id', (decrypt($request->keranjang)))->get()
+            
+        ]);
+    }
+
+    function updateTerjual(Request $request, $id) {
+
+        $produk = produk::find(decrypt($id));
+
+        if($request->terjual){
+
+            $produk->update([
+                'terjual'=>$request->terjual
+            ]);
+
+            return back()->with('berhasil', 'Berhasil Update Data');
+        }
+
+       return back()->with('gagal', 'Nominal Terjual tidak Boleh Kosong');
     }
 }

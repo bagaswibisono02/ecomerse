@@ -61,9 +61,12 @@
                 <tbody>
                     @forelse($keuangans as $item)
                         @if ($item->jenis_transaksi == 'masuk')
+                        @php
+                            $id = explode('-', $item->keterangan);
+                        @endphp
                             <tr>
                                 <td>{{ $item->tanggal_transaksi }}</td>
-                                <td>{{ $item->keterangan }}</td>
+                                <td> <a href="/resi?pesanan={{ encrypt($id[1]) }}">{{ $item->keterangan }}</a> </td>
                                 <td>@currency($item->nominal)</td>
                                 <td>-</td>
 

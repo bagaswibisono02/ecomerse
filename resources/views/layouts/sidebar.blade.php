@@ -9,7 +9,7 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Dashboard - Analytics </title>
 
     <meta name="description" content="" />
 
@@ -111,7 +111,7 @@
                                 </g>
                             </svg>
                         </span>
-                        <span class="app-brand-text demo menu-text fw-bolder ms-2">Sneat</span>
+                        <span class="app-brand-text demo menu-text fw-bolder ms-2">MVal</span>
                     </a>
 
                     <a href="javascript:void(0);"
@@ -329,7 +329,10 @@
                         </div>
                     @endif
                     <!-- Content -->
-                    @yield('content')
+                    <div>
+                        @yield('content')
+                    </div>
+                
 
                     <!-- / Content -->
 

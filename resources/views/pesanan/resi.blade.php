@@ -54,9 +54,15 @@
                         @foreach ($pesanan->pengiriman as $p)
                             <tr id="{{ $p->id }}">
                                 <td>{{ $p->status }}</td>
-                                <td>{{ $p->created_at }} <button class="btn btn-success"
-                                        onclick="tampilUpdateResi('{{ $p->id }}')">Update</button></td>
+                                <td>{{ $p->created_at }} 
+                                    @if ($pesanan->status != 'selesai')
+                                    <button class="btn btn-success"
+                                    onclick="tampilUpdateResi('{{ $p->id }}')">Update</button>
+                                </td>
+                                    @endif
+                                   
                             </tr>
+                            @if ($pesanan->status != 'selesai')
                             <tr id="form-{{ $p->id }}" class="d-none">
                                 <form action="/resi/{{ encrypt($p->id) }}/edit" method="POST">
                                     @csrf
@@ -65,7 +71,10 @@
                                     <td><button type="submit" class="btn btn-danger">Update</button></td>
                                 </form>
                             </tr>
+                            @endif
+                           
                         @endforeach
+                        @if ($pesanan->status != 'selesai')
                         <form action="/resi/{{ encrypt($pesanan->id) }}" method="POST">
                             @csrf
                             <tr>
@@ -73,6 +82,8 @@
                                 <td><button class="btn btn-success">Tambah</button></td>
                             </tr>
                         </form>
+                        @endif
+                      
                     </table>
                 </div>
             </div>
@@ -81,6 +92,13 @@
                 <img class="col-12  col-md-8 col-lg-4 "
                 src="{{ env('APP_URL') . '/file?file=' . encrypt($pesanan->konfirmasiPembayaran->bukti_transaksi) }}"
                 alt="File Hilang / Rusak">
+                @if ($pesanan->status != 'selesai')
+                <form class="col-12  col-md-8 col-lg-4 d-flex justify-content-center" action="/pesanan-diterima/{{ encrypt($pesanan->id) }}" method="post">
+                    @csrf
+                    <button onclick="return confirm('Yakin Pesanan Selesai')" class="btn btn-warning">Selesai</button>
+                    </form>
+                @endif
+                
             </div>
 
 

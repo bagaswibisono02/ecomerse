@@ -47,6 +47,9 @@ class mainController extends Controller
     {
         return view('dashboard', [
             'kategoryes' => kategory::orderBy('dicari', 'DESC')->get(),
+            'users'=>User::all(),
+            'produks'=>produk::all(),
+            'pemesanans'=>pesanan::all(),
             'pencarians' => pencarian::orderBy('created_at', 'ASC')->get(),
             'transaksis' => keuangan::orderBy('created_at', 'ASC')->limit(50)->get(),
         ]);
@@ -90,22 +93,24 @@ class mainController extends Controller
 
         if (Auth::check()) {
             $foryou = Produk::withCount(['users as total_time' => function ($query) {
-                $query->where('user_id', AUth::id())
+                $query->where('user_id', Auth::id())
                     ->select(DB::raw("SUM(times)"))
                 ;
             }])
                 ->having('total_time', '>', 0)
                 ->orderBy('total_time', 'desc')
                 ->get();
+            $idForyou = $foryou->pluck('id')->toArray();
         }
         else{
    
             $foryou= Produk::orderBy('created_at', 'DESC')->paginate(12);
+            $idForyou = $foryou->pluck('id')->toArray();
         }
         return view('produk.lihatUser', [
             'trendings' => $trending,
             'foryous' => $foryou,
-            'terbaru'=>produk::orderBy('created_at','desc')->paginate(50),
+            'terbaru'=>produk::whereNotIn('id', $idForyou)->orderBy('created_at','desc')->paginate(50),
             'afiliasi'=>platformAfiliate::all(),
             'kategorys' => kategory::all(),
         ]);

@@ -76,7 +76,7 @@
         </div>
 
         @foreach ($pesanans as $pesanan)
-            <div class="order-card">
+            <div class="order-card p-2" id="pesanandetail">
                 <div class="order-header d-flex justify-content-between">
                     <span><strong>ID Pesanan:</strong> #{{ $pesanan->id + 999 }}
                         <span>No Resi :
@@ -107,7 +107,21 @@
 
                     <div class="product-info">
                         <p class="text-sm " style="height:70px; overflow:scroll">
-                            {{ Str::limit($pesanan->produk->nama, 150) }}</p>
+                            {{ Str::limit($pesanan->produk->nama, 150) }} <br> <small> Pengiriman :
+                                {{ $pesanan->alamatPenerima->alamat . ', ' . $pesanan->alamatPenerima->kelurahan->nama . ', ' . $pesanan->alamatPenerima->kelurahan->kecamatan->nama . ', ' . $pesanan->alamatPenerima->kelurahan->kecamatan->kab_kota->nama . ', ' . $pesanan->alamatPenerima->kelurahan->kecamatan->kab_kota->provinsi->nama }}
+                                @if ($pesanan->status == 'tunggubayar')
+                                    <a
+                                        href="/pesanan/{{ encrypt($pesanan->id) }}/{{ encrypt(Auth::user()->id) }}?keranjang={{ encrypt($pesanan->id) }}">Ganti
+                                        Alamat</a>
+                                @endif
+                            </small>
+                        </p>
+
+
+                        @if ($pesanan->resi == 'ditolak')
+                            <span class="text-danger">*Resi Tidak Valid Silahkan Upload Ulang</span>
+                            <br>
+                        @endif
                         <span
                             class="badge  
                         @if ($pesanan->status == 'keranjang') bg-info
@@ -123,8 +137,8 @@
 
                         <p><strong>Total</strong> @currency($pesanan->produk->harga * $pesanan->jumlah)</p>
 
-                 
-                      
+
+
                     </div>
                     <div class="order-footer">
                         @if ($pesanan->status == 'tunggubayar')
@@ -136,13 +150,22 @@
                         @elseif($pesanan->status == 'Berhasil')
                             <a class="btn btn-primary btn-action"
                                 href="/lihat-pesanan?keranjang={{ encrypt($pesanan->id) }}">Lihat</a>
+                        @elseif($pesanan->resi == 'ditolak')
+                            <a href="/pembayaran?keranjang={{ encrypt($pesanan->id) }}" class="btn btn-danger">Update
+                                Resi</a>
+                        @elseif($pesanan->status == 'selesai' && !$pesanan->review)
+                            <a class="btn btn-primary btn-action"
+                                href="/review?keranjang={{ encrypt($pesanan->id) }}">Review</a>
+                        @elseif($pesanan->status == 'selesai' && $pesanan->review)
+                            <a class="btn btn-primary btn-action"
+                                href="/review?keranjang={{ encrypt($pesanan->id) }}&review={{ encrypt($pesanan->review->id) }}">Edit Review</a>
                         @endif
 
 
                     </div>
                 </div>
             </div>
-           
+
             <hr class="m">
         @endforeach
     </div>

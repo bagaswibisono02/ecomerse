@@ -64,4 +64,8 @@ class produk extends Model
         ->withTimestamps();;
     }
 
+    function review() {
+        return $this->hasMany(reviewProduk::class);
+    }
+
 }

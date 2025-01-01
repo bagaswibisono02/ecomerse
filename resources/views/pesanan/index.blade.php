@@ -87,7 +87,7 @@
                                                             src="{{ env('APP_URL') . '/file?file=' . encrypt($pesanan->konfirmasiPembayaran->bukti_transaksi) }}"
                                                             alt="">
                                                     @endif
-                                                    @if ($pesanan->resi == null or $pesanan->resi == 'ditolak' or  $pesanan->resi == 'direvisi')
+                                                    @if ($pesanan->resi == null or $pesanan->resi == 'ditolak' or $pesanan->resi == 'direvisi')
                                                         <a class="btn btn-success"
                                                             href="/terima?pesanan={{ encrypt($pesanan->id) }}">Terima</a>
                                                         <a class="btn btn-danger"
@@ -112,6 +112,7 @@
                                                 d="M1 7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h4.5a.5.5 0 0 0 0-1H1V8h4.5a.5.5 0 0 0 0-1zm9.5 0a.5.5 0 0 0 0 1H15v2h-4.5a.5.5 0 0 0 0 1H15a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z" />
                                         </svg>
                                     </span>
+                                    <span class="text-danger">Tunggu Resi</span>
 
                                     <!-- Modal -->
                                     <div class="modal fade" id="exampleModa{{ $pesanan->id }}" tabindex="-1"
@@ -140,10 +141,12 @@
                                                                 <input type="text" class="form-control"
                                                                     name="jasa_kirim" placeholder="Jasa Kirim"><br>
                                                                 <input type="text" class="form-control"
-                                                                    name="link_beli" value="{{ $pesanan->link_beli }}" placeholder="Link Beli">
-                                                                    @if ($pesanan->link_beli && $pesanan->resi =="diterima")
-                                                                        <a class="btn btn-danger" target="_Blank" href="{{ $pesanan->link_beli }}">Cek</a>
-                                                                    @endif
+                                                                    name="link_beli" value="{{ $pesanan->link_beli }}"
+                                                                    placeholder="Link Beli">
+                                                                @if ($pesanan->link_beli && $pesanan->resi == 'diterima')
+                                                                    <a class="btn btn-danger" target="_Blank"
+                                                                        href="{{ $pesanan->link_beli }}">Cek</a>
+                                                                @endif
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="submit" class="btn btn-primary">Masukan
@@ -170,6 +173,7 @@
                                             <path
                                                 d="M1 7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h4.5a.5.5 0 0 0 0-1H1V8h4.5a.5.5 0 0 0 0-1zm9.5 0a.5.5 0 0 0 0 1H15v2h-4.5a.5.5 0 0 0 0 1H15a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z" />
                                         </svg>
+                                        <span class="text-danger">Tunggu Slip</span>
                                     </span>
 
                                     <!-- Modal -->
@@ -185,17 +189,19 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     @if ($pesanan->konfirmasiPembayaran)
-                                                    <img width="100%"
-                                                    src="{{ env('APP_URL') . '/file?file=' . encrypt($pesanan->konfirmasiPembayaran->bukti_transaksi) }}"
-                                                    alt="">
+                                                        <img width="100%"
+                                                            src="{{ env('APP_URL') . '/file?file=' . encrypt($pesanan->konfirmasiPembayaran->bukti_transaksi) }}"
+                                                            alt="">
+                                                        <a class="btn btn-success"
+                                                            href="/terima?pesanan={{ encrypt($pesanan->id) }}">Terima</a>
+                                                        <a class="btn btn-danger"
+                                                            href="/tolak?pesanan={{ encrypt($pesanan->id) }}">Tolak</a>
                                                     @elseif(!$pesanan->konfirmasiPembayaran)
-                                                    <span class="text text-danger">*User Belum Verifikai Pembayaran</span>
+                                                        <span class="text text-danger">*User Belum Verifikai
+                                                            Pembayaran</span>
                                                     @endif
-                                                  
-                                                    <a class="btn btn-success"
-                                                        href="/terima?pesanan={{ encrypt($pesanan->id) }}">Terima</a>
-                                                    <a class="btn btn-danger"
-                                                        href="/tolak?pesanan={{ encrypt($pesanan->id) }}">Tolak</a>
+
+
 
 
                                                 </div>

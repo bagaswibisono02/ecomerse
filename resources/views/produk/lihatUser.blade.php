@@ -1,16 +1,16 @@
 @extends('layouts.navUser')
 @section('body')
     <!-- Main Content -->
-    <main>
+    <main class="">
 
        @if (!Request::get('page'))
                   <!-- For You Section -->
-        <section class="for-you">
-            <h5>Trending</h5>
+        <section class="for-you bg-daner p-3">
+            <h5 class="text-cente">Trending</h5>
             <div class="d-flex flex-wrap">
                 @foreach ($trendings as $trending)
                     <a class="col-5 m-2 m-md-0 col-sm-4 col-md-3 col-xl-2 p-0 p-sm-2"
-                        href="{{ route('detail.produk', ['data' => Crypt::encrypt(['id' => encrypt($trending->id), 'nama' => $trending->nama])]) }}"
+                        href="{{ route('detail.produk', [ 'slug' => Str::slug($trending->nama),'data' => Crypt::encrypt(['id' => encrypt($trending->id), 'nama' => $trending->nama, ])]) }}"
                         class="text-decoration-none">
                         <div class="product-card  "
                             style="  background-position: center; background-repeat: no-repeat; background-size: cover;background-image:url('{{ env('APP_URL') . '/file?file=' . encrypt($trending->media[0]->file) }}')">
@@ -43,11 +43,11 @@
                                         d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
                                 </svg>
                             </span>
-                            <img src="{{ env('APP_URL') . '/file?file=' . encrypt($foryou->media[0]->file) }}"
+                            <img   onerror="this.src='{{ env('APP_URL') . '/file?file=' . encrypt('depositphotos_247872612-stock-illustration-no-image-available-icon-vector.webp') }}';" src="{{ env('APP_URL') . '/file?file=' . encrypt($foryou->media[0]->file) }}"
                                 alt="">
                             <div class="position-relative p-2">
                                 <div class="mt-2 me-2"> <a
-                                        href="{{ route('detail.produk', ['data' => Crypt::encrypt(['id' => encrypt($foryou->id), 'nama' => $foryou->nama])]) }}"
+                                        href="{{ route('detail.produk', ['slug'=> Str::slug($foryou->nama),'data' => Crypt::encrypt(['id' => encrypt($foryou->id), 'nama' => $foryou->nama])]) }}"
                                         class="text-dark text-decoration-none">
                                         {{ Str::limit($foryou->nama, 35, '...') }}</a></div>
                                 <div class="position-absolute top-50 end-0 translate-top me-1">
@@ -59,7 +59,12 @@
                                 </div>
                             </div>
                             <small class="p-2"> <span class="text-success"> Terjual</span>
-                                {{ $foryou->id + 321 }}</small>
+                                @if ($foryou->terjual == null)
+                                    0
+                                @else
+                                {{ $foryou->terjual }}
+                                @endif
+                                </small>
                             <p class="p-2">@currency($foryou->harga)</p>
                             <div class="d-flex justify-content-center">
                                 <a href="/checkout?produk={{ encrypt($foryou->id) }}"
@@ -92,11 +97,11 @@
                                         d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
                                 </svg>
                             </span>
-                            <img src="{{ env('APP_URL') . '/file?file=' . encrypt($foryou->media[0]->file) }}"
+                            <img onerror="this.src='{{ env('APP_URL') . '/file?file=' . encrypt('depositphotos_247872612-stock-illustration-no-image-available-icon-vector.webp') }}';" src="{{ env('APP_URL') . '/file?file=' . encrypt($foryou->media[0]->file) }}"
                                 alt="">
                             <div class="position-relative p-2">
                                 <div class="mt-2 me-2"> <a
-                                        href="{{ route('detail.produk', ['data' => Crypt::encrypt(['id' => encrypt($foryou->id), 'nama' => $foryou->nama])]) }}"
+                                        href="{{ route('detail.produk', [ 'slug' => Str::slug($trending->nama),'data' => Crypt::encrypt(['id' => encrypt($foryou->id), 'nama' => $foryou->nama])]) }}"
                                         class="text-dark text-decoration-none">
                                         {{ Str::limit($foryou->nama, 35, '...') }}</a></div>
                                 <div class="position-absolute top-50 end-0 translate-top me-1">
@@ -108,7 +113,13 @@
                                 </div>
                             </div>
                             <small class="p-2"> <span class="text-success"> Terjual</span>
-                                {{ $foryou->id + 321 }}</small>
+                                @if ( $foryou->terjual == null)
+                                    0
+                                    @else
+                                    {{ $foryou->terjual }}
+                                @endif
+                                
+                               </small>
                             <p class="p-2">@currency($foryou->harga)</p>
                             <div class="d-flex justify-content-center">
                                 <a href="/checkout?produk={{ encrypt($foryou->id) }}"

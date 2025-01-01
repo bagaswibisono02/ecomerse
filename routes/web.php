@@ -11,12 +11,14 @@ use App\Http\Controllers\PenerimaController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\PengirimanController;
+use App\Livewire\Chat;
+use App\Livewire\ListUser;
+
 
 Route::get('/admin', [mainController::class ,'login']);
 Route::get('/logout', [mainController::class ,'logout']);
 Route::post('/login', [mainController::class ,'prosesLogin']);
 Route::get('/dashboard', [mainController::class ,'dashboard'])->middleware(['auth','admin']);
-Route::resource('/produk',ProdukController::class);
 Route::resource('/kategori',kategoryController::class);
 Route::resource('/penerima',PenerimaController::class);
 Route::resource('/pesanan',PesananController::class);
@@ -28,8 +30,6 @@ Route::get('/file', [mainController::class ,'getfile']); //get file
 Route::get('/download-qris', [mainController::class ,'downloadQris']); //dwonload qris
 Route::post('/upload-verifikasi-pembayaran', [pesananController::class ,'uploadPembayaran']); //dwonload qris
 
-Route::get('/varian/{id}', [ProdukController::class ,'hapusVarian']);
-Route::post('/hapus-foto-produk', [ProdukController::class ,'hapusFotoProduk']);
 
 //user
 Route::get('/', [mainController::class ,'index']);
@@ -44,7 +44,6 @@ Route::get('/register', [mainController::class ,'registerUser']);
 Route::post('/register', [mainController::class ,'prosesRegisterUser']);
 Route::get('/login', [mainController::class ,'loginUser'])->name('login');
 Route::get('/panel', [mainController::class ,'panel'])->middleware(['auth']);
-Route::get('/detail-produk', [ProdukController::class ,'lihatProduk'])->name('detail.produk');
 Route::get('/checkout', [PesananController::class ,'checkout'])->middleware("auth");
 Route::Post('/checkout', [PesananController::class ,'createSnapToken'])->middleware(['auth']);
 Route::get('/midtrans/notification', [midtransController::class ,'handleNotification']);
@@ -91,12 +90,19 @@ Route::post('/reset', [mainController::class ,'reset']);
 Route::get('/terima', [PesananController::class ,'terima']);
 Route::get('/tolak', [PesananController::class ,'tolak']);
 Route::get('/lihatresi', [PesananController::class ,'lihatResi']);
+Route::post('/pesanan-diterima/{id}', [PesananController::class ,'diterima']);
+Route::get('/review', [ProdukController::class ,'review']);
+Route::get('/pesanan/{idpesanan}/{iduser}', [PesananController::class ,'gantiAlamat']);
+Route::post('/editpesanan', [PesananController::class ,'editPesanan']);
+Route::post('/submit-review', [PesananController::class ,'tambahReview']);
+Route::post('/submit-review/{pesanan_id}/edit', [PesananController::class ,'editReview']);
 
-// @if (Carbon::parse($pesanan->created_at)->diffInHours(now()) > 24 && $pesanan->status == 'tunggubayar')
-// <form action="/hapuspesanan/{{ encrypt($pesanan->id) }}" method="post">
-//     @csrf
-//     <button class="btn btn-light border border-dark" type="submit"
-//         onclick="return confirm('Yakin Ingin Menghapus Data Pesanan ? ')">Hapus</button>
-// </form>
-// @else
-//   @endif
+//produk
+Route::resource('/produk',ProdukController::class);
+Route::get('/detail-produk/{slug}/{data}', [ProdukController::class ,'lihatProduk'])->name('detail.produk');
+Route::get('/varian/{id}', [ProdukController::class ,'hapusVarian']);
+Route::post('/hapus-foto-produk', [ProdukController::class ,'hapusFotoProduk']);
+Route::post('/update-terjual/{id}', [ProdukController::class ,'updateTerjual']);
+
+//modul chat
+Route::get('/chat', Chat::class);

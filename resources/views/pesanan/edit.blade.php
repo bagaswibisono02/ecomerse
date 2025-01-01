@@ -10,17 +10,17 @@
     <div class="container d-flex justify-content-center">
         <div class="bg-white d-flex justify-content-center col-12 m-2">
             <div class="col-10">
-                <h4 class="m-2 text-center">Check Out</h4>
+                <h4 class="m-2 text-center">Update Pesanan</h4>
                 <div class="p-3" style="background-color: rgb(236, 236, 236)">
                     <h4></h4>
-                    <h5> Alamat Pengiriman : <span id="alamatfix"></span> <!-- Button trigger modal -->
+                    <h5> Alamat Pengiriman : <span id="alamatfix">{{ $pesanan->alamatPenerima->alamat . ', ' . $pesanan->alamatPenerima->kelurahan->nama . ', ' . $pesanan->alamatPenerima->kelurahan->kecamatan->nama . ', ' . $pesanan->alamatPenerima->kelurahan->kecamatan->kab_kota->nama . ', ' . $pesanan->alamatPenerima->kelurahan->kecamatan->kab_kota->provinsi->nama }}</span> <!-- Button trigger modal -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleM">
                             Ubah
                         </button>
                     </h5>
                     @error('penerima')
                     <span class="text-danger">
-                        Pilih Alamat Pengiriman
+                        Pilih Alamat Pengiriman 
                     </span>
                     @enderror
                     <small class="text-danger">Pasitkan Alamat Anda Terdaftar Di Daerah Gratis Ongkir Agar Tidak Terjadi Pembatalan</small>
@@ -96,7 +96,7 @@
                                             <textarea name="dusun" id="" cols="10" class="form-control" rows="5"></textarea>
                                         </div>
                                         <div>
-                                            <button type="submit" class="btn btn-primary">Tambah</button>
+                                            <button type="submit" onclick="list()" class="btn btn-primary">Tambah</button>
                                         </div>
 
 
@@ -152,7 +152,7 @@
                                 <div class="col-12 col-md-12 col-lg-3" style="width: 400px">
                                     <div class="foto col-12 row flex-row flex-nowrap " id="filePreviewContainer"
                                         style="overflow-x: scroll">
-                                        @foreach ($produk->media as $media)
+                                        @foreach ($pesanan->produk->media as $media)
                                             <div class="p-3" style="width: 370px">
                                                 <img class="p-1"
                                                     src="{{ env('APP_URL') . '/file?file=' . encrypt($media->file) }}"
@@ -174,9 +174,9 @@
                                 <!-- Deskripsi Produk -->
                                 <div class="col-12 col-md-12  col-lg-6  mt-4">
                                     <div>
-                                        <h2>{{ $produk->nama }}</h2>
-                                        <p class="text-muted">Kategori: {{ $produk->kategory->name }}</p>
-                                        <p>Varian @foreach ($produk->varian as $varian)
+                                        <h2>{{ $pesanan->produk->nama }}</h2>
+                                        <p class="text-muted">Kategori: {{ $pesanan->produk->kategory->name }}</p>
+                                        <p>Varian @foreach ($pesanan->produk->varian as $varian)
                                                 <button id="{{ 'varian-' . $varian->id }}"
                                                     onclick="selectVarian('{{ 'varian-' . $varian->id }}')"
                                                     class="badge list-varian bordered text-dark  border-success">
@@ -193,8 +193,8 @@
                                         
                                         </small>
                                         <h4 class="text-danger">
-                                            @currency($produk->harga)
-                                            <span id="harga_awal" class="d-none">{{ $produk->harga }}</span>
+                                            @currency($pesanan->produk->harga)
+                                            <span id="harga_awal" class="d-none">{{ $pesanan->produk->harga }}</span>
 
                                         </h4>
                                         <small>
@@ -202,7 +202,7 @@
                                                 src="https://images.tokopedia.net/img/cache/700/VqbcmM/2022/2/22/682b7c8a-6a43-4c9a-a0ef-92d221af7fb9.jpg"
                                                 alt=""> Gratis Ongkir
                                         </small>
-                                        <p>Daerah Gratis Ongkir : @foreach ($produk->provinsi as $item)
+                                        <p>Daerah Gratis Ongkir : @foreach ($pesanan->produk->provinsi as $item)
                                                 {{ $item->nama }}@if (!$loop->last)
                                                     ,
                                                 @endif
@@ -216,8 +216,8 @@
                                         <div class="col-6">
                                             <div class=" h6 bg-success text-white p-2 round rounded-3 ">
                                                 <span> Total Harga</span> <br>
-                                                <span id="hargatotal"> @currency($produk->harga)</span>
-                                                <input type="hidden" name="jumlahBeli" id="jumlahBeli" value="1">
+                                                <span id="hargatotal"> @currency($pesanan->produk->harga)</span>
+                                                <input type="hidden" name="jumlahBeli" id="jumlahBeli" value="{{ $pesanan->jumlah }}">
 
                                             </div>
 
@@ -233,7 +233,7 @@
                                                 </svg>
                                             </button>
 
-                                            <span class="ms-2 me-2 fs-5" id="total">1</span>
+                                            <span class="ms-2 me-2 fs-5" id="total">{{ $pesanan->jumlah }}</span>
                                             <button class="text-success btn btn-light" onclick="add()">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
                                                     fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
@@ -248,13 +248,13 @@
 
                                     </div>
                                     <div class="col-12">
-                                        <form action="/checkout?@if(Request::get('keranjang'))keranjang={{Request::get('keranjang')}}@endif" class="mb-3 btn" method="post">
-                                            <input type="text" name="catatan" placeholder="Pesan">
+                                        <form action="/editpesanan?@if(Request::get('keranjang'))keranjang={{Request::get('keranjang')}}@endif" class="mb-3 btn" method="post">
+                                            <input type="text" value="{{ $pesanan->catatan }}" name="catatan" placeholder="Pesan">
                                             @csrf
-                                            <input type="hidden" name="produk" value="{{ encrypt($produk->id) }}">
+                                            <input type="hidden" name="produk" value="{{ encrypt($pesanan->produk->id) }}">
                                             <input type="hidden" name="jumlahBeli" id="input_jumlah_beli"
-                                                value="1">
-                                            <input type="hidden" id="input_alamat_id" name="penerima" value="">
+                                                value="{{ $pesanan->jumlah }}">
+                                            <input type="hidden" id="input_alamat_id" name="penerima"value="{{ encrypt($pesanan->alamat_penerima_id) }}">
                                             <input type="hidden" id="input_varian" name="varian" value="Original">
                                             <button class="btn btn-danger">Pesan Sekarang</button>
                                         </form>
@@ -393,5 +393,23 @@
             document.querySelector(`input[type="radio"][id="${id}"]`).checked = true;;
 
         }
+
+          // This function runs when the page is fully loaded
+    window.onload = function() {
+       
+        let harga_awal = parseInt(document.getElementById('harga_awal').innerText)
+            console.log(harga_awal)
+            let hargatotal = document.getElementById('hargatotal')
+
+            let total = parseInt(document.getElementById('total').innerText)
+            let jumlah = document.getElementById('total').innerText = total 
+
+            let final = harga_awal * jumlah
+            hargatotal.innerText = formatRupiah(final)
+            document.getElementById('jumlahBeli').value = total
+
+            document.getElementById('input_jumlah_beli').value = jumlah
+        
+    }
     </script>
 @endsection

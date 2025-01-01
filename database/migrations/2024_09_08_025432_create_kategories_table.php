@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('kategories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('dicari')->nullable();
+            $table->integer('dicari')->nullable();
             $table->timestamps();
         });
     }

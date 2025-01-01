@@ -146,3 +146,25 @@ footer {
         1px 1px 0 black;   /* Bayangan ke kanan bawah */
     
 }
+
+#pesanandetail:hover{
+    background-color: rgb(222, 227, 243);
+}
+.stars {
+    display: inline-block;
+}
+.star {
+    font-size: 30px;
+    color: gray;
+    cursor: pointer;
+}
+.star.selected {
+    color: gold;
+}
+
+#filePreview img {
+    height: 200px; /* Atur panjang gambar */
+    object-fit: cover; /* Pilihan untuk menjaga proporsi atau crop gambar */
+    width: 200px; /* Agar gambar memenuhi lebar div */
+    margin: 2px;
+}

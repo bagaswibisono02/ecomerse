@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\alamat_penerima;
 use App\Models\kategory;
+use App\Models\keuangan;
 use App\Models\konfirmasiPembayaran;
-use Carbon\Carbon;
+use App\Models\mediaReview;
 use App\Models\pengiriman;
 use App\Models\pesanan;
-use App\Models\keuangan;
 use App\Models\produk;
 use App\Models\provinsi;
+use App\Models\reviewProduk;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -241,17 +243,17 @@ class PesananController extends Controller
             $path = storage_path('app/public/' . $filename);
 
             //
-            $id_konfirmasiPembayaran=$pesanan->konfirmasiPembayaran->id;
+            $id_konfirmasiPembayaran = $pesanan->konfirmasiPembayaran->id;
 
             if (File::exists($path)) {
                 File::delete($path);
-             
+
                 konfirmasiPembayaran::find($id_konfirmasiPembayaran)->update([
                     'bukti_transaksi' => $file->store('bukti_pembayaran', 'public'),
                 ]);
                 $pesanan->update([
                     'status' => 'diproses',
-                    'resi'=>'direvisi'
+                    'resi' => 'direvisi',
                 ]);
                 return redirect('/panel?filter=diproses');
             } else {
@@ -260,7 +262,7 @@ class PesananController extends Controller
                 ]);
                 $pesanan->update([
                     'status' => 'diproses',
-                    'resi'=>'direvisi'
+                    'resi' => 'direvisi',
                 ]);
                 return redirect('/panel?filter=diproses');
             }
@@ -282,16 +284,20 @@ class PesananController extends Controller
     public function terima(Request $request)
     {
         $id = decrypt($request->pesanan);
-        $pesanan =   pesanan::find($id);
-     $pesanan->update([
+        $pesanan = pesanan::find($id);
+        $pesanan->update([
             'resi' => 'diterima',
         ]);
 
         keuangan::create([
-            'tanggal_transaksi'=>Carbon::now(),
-            'keterangan'=>'Pembayaran Pesanan-'.$id,
-            'nominal'=>$pesanan->jumlah * $pesanan->produk->harga,
-            'jenis_transaksi'=>'masuk'
+            'tanggal_transaksi' => Carbon::now(),
+            'keterangan' => 'Pembayaran Pesanan-' . $id,
+            'nominal' => $pesanan->jumlah * $pesanan->produk->harga,
+            'jenis_transaksi' => 'masuk',
+        ]);
+        $produk =  produk::find($pesanan->produk->id);
+        $produk->update([
+            'terjual'=> $produk->terjual + 1
         ]);
 
         return back();
@@ -306,15 +312,122 @@ class PesananController extends Controller
         return back();
     }
 
-    function lihatResi(Request $request){
-        if(!$request->pesanan){
+    public function lihatResi(Request $request)
+    {
+        if (!$request->pesanan) {
             return back();
         }
         $id_pesanan = decrypt($request->pesanan);
-        return view('pesanan.lihatResi',[
-            'pesanan'=>pesanan::find($id_pesanan),
+        return view('pesanan.lihatResi', [
+            'pesanan' => pesanan::find($id_pesanan),
             'kategorys' => kategory::all(),
         ]);
+    }
+
+    public function diterima($id)
+    {
+        $decryptId = decrypt($id);
+        $pesanan = pesanan::find($decryptId);
+
+        $pesanan->update([
+            'status' => 'selesai',
+        ]);
+
+        return redirect('/pesanan')->with('berhasil', 'Pesanan Selesai');
+    }
+
+    public function gantiAlamat($idproduk, $iduser, Request $request)
+    {
+        return view('pesanan.edit', [
+            'provinsis' => provinsi::orderBy('nama', 'ASC')->get(),
+            'penerimas' => alamat_penerima::where('user_id', Auth::User()->id)->with(['kelurahan.kecamatan.kab_kota.provinsi'])->get(),
+            'pesanan' => pesanan::find(decrypt($idproduk)),
+            'kategorys' => kategory::all(),
+
+        ]);
+    }
+
+    public function editPesanan(Request $request)
+    {
+
+        pesanan::find(decrypt($request->keranjang))->update([
+            'jumlah' => $request->jumlahBeli,
+            'alamat_penerima_id' => decrypt($request->penerima),
+            'catatan' => $request->catatan,
+            'varian' => $request->varian,
+        ]);
+
+        return redirect('/panel');
+    }
+
+    public function tambahReview(Request $request)
+    {
+
+        $pesanan = pesanan::find(decrypt($request->pesanan));
+        $produk = $pesanan->produk;
+        // dd($produk);
+
+        $review = reviewProduk::create([
+            'produk_id' => $produk->id,
+            'pesanan_id' => decrypt($request->pesanan),
+            'user_id' => Auth::user()->id,
+            'bintang' => $request->rating,
+            'hasil' => $request->review,
+        ]);
+
+        if ($request->file('fotoReview')) {
+
+            foreach ($request->file('fotoReview') as $media) {
+                mediaReview::create([
+                    "mediaReview_id" => $review->id,
+                    'file' => $media->store('foto-review', 'public'),
+                ]);
+
+            }
+        }
+
+        return redirect('/panel?filter=selesai');
+    }
+
+    public function editReview(Request $request)
+    {
+// dd($request);
+        $pesanan = pesanan::find(decrypt($request->pesanan));
+       
+
+        $review = $pesanan->review;
+        
+
+        reviewProduk::find($review->id)->update([
+            // 'produk_id'=> $produk->id,
+            // 'pesanan_id'=> decrypt($request->pesanan),
+            // 'user_id'=>Auth::user()->id,
+            'bintang' => $request->rating,
+            'hasil' => $request->review,
+        ]);
+
+        if ($request->file('fotoReview')) {
+            $mediaLama = $review->mediaReview;
+
+            foreach ($mediaLama as $med) {
+                $filePath = storage_path('app/public/' . $med->file);
+                if (File::exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                mediaReview::find($med->id)->delete();
+            }
+
+            foreach ($request->file('fotoReview') as $media) {
+                mediaReview::create([
+                    "mediaReview_id" => $review->id,
+                    'file' => $media->store('foto-review', 'public'),
+                ]);
+
+            }
+        }
+
+        return redirect('/panel');
     }
 
 }
